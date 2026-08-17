@@ -11,10 +11,10 @@ then
       latest_release=$(curl -s https://evermeet.cx/ffmpeg/info/ffmpeg/release | jq -r .version)
     fi
   else
-    latest_release_linux=$(curl -s https://endoflife.date/api/ffmpeg.json | jq -r .[0].cycle)
-    if [ "$(curl -sLIo /dev/null -w %{http_code} $GITHUB_SERVER_URL/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n$latest_release_linux-latest-linux64-gpl-$latest_release_linux.tar.xz)" = 404 ]
+    latest_release_linux=$(gh api repos/BtbN/FFmpeg-Builds/releases/latest -q '[.assets[].name | capture("^ffmpeg-n(?<v>[0-9]+(?:\\.[0-9]+)+)-latest-") | .v] | unique | max_by(split(".") | map(tonumber))')
+    if [ -z $latest_release_linux ]
     then
-      latest_release_linux=$(curl -s https://endoflife.date/api/ffmpeg.json | jq -r .[1].cycle)
+      latest_release_linux=$(curl -s https://endoflife.date/api/ffmpeg.json | jq -r .[0].cycle)
     fi
     latest_release=$latest_release_linux
   fi
